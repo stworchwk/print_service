@@ -1,11 +1,11 @@
 ## ==> GUI FILE
-from main import *
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 ## ==> GLOBALS
 
 GLOBAL_STATE = 0
 
-class UIFunctions():
+class UIFunctions(QtWidgets.QMainWindow):
 
     ## ==> MAXIMIZE RESTORE FUNCTION
     def maximize_restore(self):
@@ -39,11 +39,11 @@ class UIFunctions():
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         
         # SET DROPSHADOW WINDOW
-        self.shadow = QGraphicsDropShadowEffect(self)
+        self.shadow = QtWidgets.QGraphicsDropShadowEffect(self)
         self.shadow.setBlurRadius(20)
         self.shadow.setXOffset(0)
         self.shadow.setYOffset(0)
-        self.shadow.setColor(QColor(0, 0, 0, 100))
+        self.shadow.setColor(QtGui.QColor(0, 0, 0, 100))
 
         # APPLY DROPSHADOW TO FRAME
         self.ui.drop_shadow_frame.setGraphicsEffect(self.shadow)
@@ -58,10 +58,10 @@ class UIFunctions():
         self.ui.btn_close.clicked.connect(lambda: self.close())
 
         ## ==> CREATE SIZE GRIP TO RESIZE WINDOW
-        self.sizegrip = QSizeGrip(self.ui.frame_grip)
+        self.sizegrip = QtWidgets.QSizeGrip(self.ui.frame_grip)
         self.sizegrip.setStyleSheet("QSizeGrip { width: 10px; height: 10px; margin: 5px } QSizeGrip:hover { background-color: rgb(50, 42, 94) }")
         self.sizegrip.setToolTip("Resize Window")
 
     ## RETURN STATUS IF WINDOWS IS MAXIMIZE OR RESTAURED
-    def returnStatus():
+    def returnStatus(self):
         return GLOBAL_STATE

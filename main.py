@@ -1,14 +1,14 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QSizeGrip
+#from PyQt5.QtCore import Qt
+#from PyQt5.QtGui import QColor
+#from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QSizeGrip
 
 # GUI FILE
 from ui_main import Ui_MainWindow
 
 # IMPORT FUNCTIONS
-from ui_functions import *
+from ui_functions import UIFunctions
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -19,11 +19,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # MOVE WINDOW
         def moveWindow(event):
             # RESTORE BEFORE MOVE
-            if UIFunctions.returnStatus() == 1:
+            if UIFunctions.returnStatus(self) == 1:
                 UIFunctions.maximize_restore(self)
 
             # IF LEFT CLICK MOVE WINDOW
-            if event.buttons() == Qt.LeftButton:
+            if event.buttons() == QtCore.Qt.LeftButton:
                 self.move(self.pos() + event.globalPos() - self.dragPos)
                 self.dragPos = event.globalPos()
                 event.accept()
