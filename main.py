@@ -1,14 +1,14 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-#from PyQt5.QtCore import Qt
-#from PyQt5.QtGui import QColor
-#from PyQt5.QtWidgets import QGraphicsDropShadowEffect, QSizeGrip
 
 # GUI FILE
 from ui_main import Ui_MainWindow
 
-# IMPORT FUNCTIONS
+# IMPORT UI FUNCTIONS
 from ui_functions import UIFunctions
+
+# IMPORT App FUNCTIONS
+from app_functions import AppFunctions
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -46,6 +46,10 @@ class MainWindow(QtWidgets.QMainWindow):
         ########################################################################
         self.show()
         ## ==> END ##
+
+        #AppFunctions.update_config(self, "http://localhost:8080", 10)
+
+        print(AppFunctions.call_config(self))
 
     ## APP EVENTS
     ########################################################################

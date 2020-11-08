@@ -2,7 +2,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 ## ==> GLOBALS
-
 GLOBAL_STATE = 0
 
 class UIFunctions(QtWidgets.QMainWindow):
@@ -59,7 +58,6 @@ class UIFunctions(QtWidgets.QMainWindow):
 
         ## ==> CREATE SIZE GRIP TO RESIZE WINDOW
         self.sizegrip = QtWidgets.QSizeGrip(self.ui.frame_grip)
-        self.sizegrip.setStyleSheet("QSizeGrip { width: 10px; height: 10px; margin: 5px } QSizeGrip:hover { background-color: rgb(50, 42, 94) }")
         self.sizegrip.setToolTip("Resize Window")
 
     ## RETURN STATUS IF WINDOWS IS MAXIMIZE OR RESTAURED
