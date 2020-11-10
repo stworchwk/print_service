@@ -25,5 +25,3 @@ class AppFunctions():
 
         with open(CONFIG_FILE_NAME, 'w') as configfile:
             config.write(configfile)
-
-        

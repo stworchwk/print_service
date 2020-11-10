@@ -178,12 +178,12 @@ class Ui_MainWindow(object):
         self.frame_circle.setMinimumSize(QtCore.QSize(250, 250))
         self.frame_circle.setMaximumSize(QtCore.QSize(250, 250))
         self.frame_circle.setStyleSheet("QFrame{\n"
-"    border: 5px solid rgb(60, 231, 195);\n"
+"    border: 5px solid rgba(255, 0, 0, 150);\n"
 "    border-radius: 125px;\n"
 "}\n"
 "\n"
 "QFrame:hover {\n"
-"    border: 5px solid rgb(105, 95, 148);\n"
+"    border: 5px solid rgb(85, 255, 0);\n"
 "}")
         self.frame_circle.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_circle.setFrameShadow(QtWidgets.QFrame.Raised)
@@ -559,10 +559,10 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Print Service"))
         self.label_circle_main.setText(_translate("MainWindow", "Start"))
         self.label_circle_host.setText(_translate("MainWindow", "Host: https://barrabo.com/print-tasks"))
-        self.label_circle_status.setText(_translate("MainWindow", "<html><head/><body><p>Status: <span style=\" font-weight:600; color:#55ff00;\">ready</span></p></body></html>"))
-        self.label_detail_success.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">31</span><span style=\" font-size:9pt; color:#c7c7c7;\">Tasks</span></p></body></html>"))
+        self.label_circle_status.setText(_translate("MainWindow", "<html><head/><body><p>Status: <span style=\" font-weight:600; color:#ff0000;\">Service not started</span></p></body></html>"))
+        self.label_detail_success.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">0 </span><span style=\" font-size:9pt; color:#c7c7c7;\">Tasks</span></p></body></html>"))
         self.label_6.setText(_translate("MainWindow", "SUCCESS"))
-        self.label_detail_run_time.setText(_translate("MainWindow", "00:34:00"))
+        self.label_detail_run_time.setText(_translate("MainWindow", "00:00:00"))
         self.label_8.setText(_translate("MainWindow", "RUNTIME"))
         self.label_detail_failed.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">0 </span><span style=\" font-size:9pt; color:#c7c7c7;\">Tasks</span></p></body></html>"))
         self.label_10.setText(_translate("MainWindow", "FAILED"))

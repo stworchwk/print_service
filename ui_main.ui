@@ -445,6 +445,9 @@ color: rgb(60, 231, 195);</string>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
+                         </property>
                         </widget>
                        </item>
                        <item>
@@ -464,6 +467,9 @@ color: rgb(220, 220, 220);</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
                          </property>
                         </widget>
                        </item>
@@ -485,6 +491,9 @@ color: rgb(128, 102, 168);</string>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
                          </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
+                         </property>
                         </widget>
                        </item>
                        <item>
@@ -500,10 +509,13 @@ color: rgb(128, 102, 168);</string>
 color: rgb(60, 231, 195);</string>
                          </property>
                          <property name="text">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Status: &lt;span style=&quot; font-weight:600; color:#55ff00;&quot;&gt;ready&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Status: &lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;ready&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignCenter</set>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
                          </property>
                         </widget>
                        </item>
