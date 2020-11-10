@@ -1,6 +1,5 @@
 import sys
-import platform
-import subprocess
+import requests
 from threading import Timer
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -18,6 +17,8 @@ GLOBAL_SERVICE_STATUS = 0
 RUNTIME_HOURS = 0
 RUNTIME_MINUTES = 0
 RUNTIME_SECONDS = 0
+TASK_SUCCESS = 0
+TASK_FAILURE = 0
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -45,6 +46,15 @@ class MainWindow(QtWidgets.QMainWindow):
         ## ==> SET UI DEFINITIONS
         UIFunctions.uiDefinitions(self)
 
+        # CLOSE
+        self.ui.btn_close.clicked.connect(lambda: closeWindow())
+
+        def closeWindow():
+            global t, s
+            self.close()
+            t.cancel()
+            s.cancel()
+
         ## PAGES
         ########################################################################
 
@@ -65,9 +75,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
             if status == 0:
                 config = AppFunctions.call_config(self)
-                param = '-n' if platform.system().lower()=='windows' else '-c'
-                command = ['ping', param, '1', config[0]]
-                if subprocess.call(command) == 0:
+                response = requests.get(config[0] + config[2])
+                if response.json()["status"] == 'success':
                     GLOBAL_SERVICE_STATUS = 1
                     MainWindow.runTime(self)
                     MainWindow.printService(self)
@@ -102,8 +111,12 @@ class MainWindow(QtWidgets.QMainWindow):
             config = AppFunctions.call_config(self)
             global s, GLOBAL_SERVICE_STATUS
             status = GLOBAL_SERVICE_STATUS
+
+            response = requests.get(config[0] + config[3])
+            print(response)
+
+            MainWindow.renderTasksSuccessAndFailure(self)
             if status == 1:
-                print('Service')
                 s = Timer(float(config[1]), requestTasks)
                 s.start()
 
@@ -115,7 +128,6 @@ class MainWindow(QtWidgets.QMainWindow):
             global t, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
             status = GLOBAL_SERVICE_STATUS
             if status == 1:
-                print('Time')
                 RUNTIME_SECONDS = RUNTIME_SECONDS + 1
                 if RUNTIME_SECONDS >= 60:
                     RUNTIME_MINUTES = RUNTIME_MINUTES + 1
@@ -131,7 +143,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def renderRunTime(self):
         self.ui.label_detail_run_time.setText(str(RUNTIME_HOURS).zfill(2) + ":" + str(RUNTIME_MINUTES).zfill(2) + ":" + str(RUNTIME_SECONDS).zfill(2))
 
-            
+    def renderTasksSuccessAndFailure(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.ui.label_detail_success.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">" + str(TASK_SUCCESS) + " </span><span style=\" font-size:9pt; color:#c7c7c7;\">Tasks</span></p></body></html>"))
+        self.ui.label_detail_failed.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">" + str(TASK_FAILURE) + " </span><span style=\" font-size:9pt; color:#c7c7c7;\">Tasks</span></p></body></html>"))
+
     def uiSwitchService(self):
         global GLOBAL_SERVICE_STATUS
         status = GLOBAL_SERVICE_STATUS
@@ -163,10 +179,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def ping(self):
         config = AppFunctions.call_config(self)
-        param = '-n' if platform.system().lower()=='windows' else '-c'
-        command = ['ping', param, '1', config[0]]
+        response = requests.get(config[0] + config[2])
         _translate = QtCore.QCoreApplication.translate
-        if subprocess.call(command) == 0:
+        if response.json()["status"] == 'success':
             self.ui.frame_host_status.setStyleSheet("background-color: rgb(85, 255, 0); border-radius: 8px;")
             self.ui.stackedWidget.setCurrentWidget(self.ui.page_home)
 

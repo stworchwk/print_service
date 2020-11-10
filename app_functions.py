@@ -14,7 +14,7 @@ class AppFunctions():
     
     def call_config(self):
         config = AppFunctions.initial_config(self)
-        return [config['host']['host'], config['host']['inval']]
+        return [config['host']['host'], config['host']['inval'], config['host']['test_connect_path'], config['host']['task_path']]
 
 
     def update_config(self, new_host, new_inval):

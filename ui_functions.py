@@ -53,9 +53,6 @@ class UIFunctions(QtWidgets.QMainWindow):
         # MINIMIZE
         self.ui.btn_minimize.clicked.connect(lambda: self.showMinimized())
 
-        # CLOSE
-        self.ui.btn_close.clicked.connect(lambda: self.close())
-
         ## ==> CREATE SIZE GRIP TO RESIZE WINDOW
         self.sizegrip = QtWidgets.QSizeGrip(self.ui.frame_grip)
         self.sizegrip.setToolTip("Resize Window")
