@@ -57,19 +57,30 @@ class MainWindow(QtWidgets.QMainWindow):
         ## MAIN FUNCTIONS
         MainWindow.configInit(self)
 
-        MainWindow.printService(self)
-
         self.ui.btn_save_config.clicked.connect(lambda: MainWindow.updateConfig(self))
 
         def switchService(event):
-            global GLOBAL_SERVICE_STATUS
+            global t, s, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
             status = GLOBAL_SERVICE_STATUS
 
             if status == 0:
-                GLOBAL_SERVICE_STATUS = 1
-                MainWindow.runTime(self)
+                config = AppFunctions.call_config(self)
+                param = '-n' if platform.system().lower()=='windows' else '-c'
+                command = ['ping', param, '1', config[0]]
+                if subprocess.call(command) == 0:
+                    GLOBAL_SERVICE_STATUS = 1
+                    MainWindow.runTime(self)
+                    MainWindow.printService(self)
+                else:
+                    self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
             else:
                 GLOBAL_SERVICE_STATUS = 0
+                RUNTIME_HOURS = 0
+                RUNTIME_MINUTES = 0
+                RUNTIME_SECONDS = 0
+                t.cancel()
+                s.cancel()
+                MainWindow.renderRunTime(self)
             
             MainWindow.uiSwitchService(self)
 
@@ -86,16 +97,15 @@ class MainWindow(QtWidgets.QMainWindow):
     ########################################################################
 
     def printService(self):
+        s = None
         def requestTasks():
             config = AppFunctions.call_config(self)
-            global GLOBAL_SERVICE_STATUS
+            global s, GLOBAL_SERVICE_STATUS
             status = GLOBAL_SERVICE_STATUS
-            if status == 0:
-                print("Service Start")
-            else:
-                print("Service Stop")
-                
-            Timer(float(config[1]), requestTasks).start()
+            if status == 1:
+                print('Service')
+                s = Timer(float(config[1]), requestTasks)
+                s.start()
 
         requestTasks()
 
@@ -104,12 +114,8 @@ class MainWindow(QtWidgets.QMainWindow):
         def timeRunning():
             global t, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
             status = GLOBAL_SERVICE_STATUS
-            if status == 0:
-                t.cancel()
-                RUNTIME_HOURS = 0
-                RUNTIME_MINUTES = 0
-                RUNTIME_SECONDS = 0
-            else:
+            if status == 1:
+                print('Time')
                 RUNTIME_SECONDS = RUNTIME_SECONDS + 1
                 if RUNTIME_SECONDS >= 60:
                     RUNTIME_MINUTES = RUNTIME_MINUTES + 1
@@ -119,12 +125,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     RUNTIME_MINUTES = 0
                 t = Timer(1.0, timeRunning)
                 t.start()
-            renderRunTime()
-
-        def renderRunTime():
-            self.ui.label_detail_run_time.setText(str(RUNTIME_HOURS).zfill(2) + ":" + str(RUNTIME_MINUTES).zfill(2) + ":" + str(RUNTIME_SECONDS).zfill(2))
-
+            MainWindow.renderRunTime(self)
         timeRunning()
+
+    def renderRunTime(self):
+        self.ui.label_detail_run_time.setText(str(RUNTIME_HOURS).zfill(2) + ":" + str(RUNTIME_MINUTES).zfill(2) + ":" + str(RUNTIME_SECONDS).zfill(2))
+
             
     def uiSwitchService(self):
         global GLOBAL_SERVICE_STATUS
@@ -156,8 +162,9 @@ class MainWindow(QtWidgets.QMainWindow):
         MainWindow.ping(self)
 
     def ping(self):
+        config = AppFunctions.call_config(self)
         param = '-n' if platform.system().lower()=='windows' else '-c'
-        command = ['ping', param, '1', self.ui.lineEdit_host_address.text()]
+        command = ['ping', param, '1', config[0]]
         _translate = QtCore.QCoreApplication.translate
         if subprocess.call(command) == 0:
             self.ui.frame_host_status.setStyleSheet("background-color: rgb(85, 255, 0); border-radius: 8px;")
