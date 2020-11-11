@@ -1,8 +1,8 @@
 import sys
-import requests
-from threading import Timer
+import time
+from threading import Timer, Thread
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
 
 # GUI FILE
 from ui_main import Ui_MainWindow
@@ -19,6 +19,8 @@ RUNTIME_MINUTES = 0
 RUNTIME_SECONDS = 0
 TASK_SUCCESS = 0
 TASK_FAILURE = 0
+RUN_TIME_THREAD = None
+REQUEST_THREAD = None
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -50,10 +52,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btn_close.clicked.connect(lambda: closeWindow())
 
         def closeWindow():
-            global t, s
+            global RUN_TIME_THREAD, REQUEST_THREAD
             self.close()
-            t.cancel()
-            s.cancel()
+            if RUN_TIME_THREAD != None:
+                RUN_TIME_THREAD.cancel()
+            if REQUEST_THREAD != None:
+                REQUEST_THREAD.cancel()
 
         ## PAGES
         ########################################################################
@@ -70,29 +74,28 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btn_save_config.clicked.connect(lambda: MainWindow.updateConfig(self))
 
         def switchService(event):
-            global t, s, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
+            global RUN_TIME_THREAD, REQUEST_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS, SWITCH_SERVICE_PING_REQUEST
             status = GLOBAL_SERVICE_STATUS
 
             if status == 0:
                 config = AppFunctions.call_config(self)
-                response = requests.get(config[0] + config[2])
-                if response.json()["status"] == 'success':
-                    GLOBAL_SERVICE_STATUS = 1
-                    MainWindow.runTime(self)
-                    MainWindow.printService(self)
-                else:
-                    self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
+                url = config[0] + config[2]
+                req = QtNetwork.QNetworkRequest(QtCore.QUrl(url))
+                SWITCH_SERVICE_PING_REQUEST = QtNetwork.QNetworkAccessManager()
+                SWITCH_SERVICE_PING_REQUEST.finished.connect(self.handleResponseOfSwitchService)
+                SWITCH_SERVICE_PING_REQUEST.get(req)
             else:
                 GLOBAL_SERVICE_STATUS = 0
                 RUNTIME_HOURS = 0
                 RUNTIME_MINUTES = 0
                 RUNTIME_SECONDS = 0
-                t.cancel()
-                s.cancel()
+                if RUN_TIME_THREAD != None:
+                    RUN_TIME_THREAD.cancel()
+                if REQUEST_THREAD != None:
+                    REQUEST_THREAD.cancel()
                 MainWindow.renderRunTime(self)
+                MainWindow.uiSwitchService(self)
             
-            MainWindow.uiSwitchService(self)
-
         ## Start&Stop Service
         self.ui.frame_circle.mousePressEvent = switchService
 
@@ -106,26 +109,44 @@ class MainWindow(QtWidgets.QMainWindow):
     ########################################################################
 
     def printService(self):
-        s = None
+        def response(reply):
+            global RUN_TIME_THREAD, REQUEST_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
+            er = reply.error()
+            if er == QtNetwork.QNetworkReply.NoError:
+                print('response')
+            else:
+                GLOBAL_SERVICE_STATUS = 0
+                RUNTIME_HOURS = 0
+                RUNTIME_MINUTES = 0
+                RUNTIME_SECONDS = 0
+                if RUN_TIME_THREAD != None:
+                    RUN_TIME_THREAD.cancel()
+                if REQUEST_THREAD != None:
+                    REQUEST_THREAD.cancel()
+                MainWindow.renderRunTime(self)
+                MainWindow.uiSwitchService(self)
+                self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
         def requestTasks():
+            print('request')
             config = AppFunctions.call_config(self)
-            global s, GLOBAL_SERVICE_STATUS
+            global REQUEST_THREAD, GLOBAL_SERVICE_STATUS, REQUEST_TASKS
             status = GLOBAL_SERVICE_STATUS
+            url = config[0] + config[3]
+            REQUEST_TASKS = QtNetwork.QNetworkAccessManager()
+            reply = REQUEST_TASKS.get(QtNetwork.QNetworkRequest(QtCore.QUrl(url)))
+            response(reply)
 
-            response = requests.get(config[0] + config[3])
-            print(response)
+            #MainWindow.renderTasksSuccessAndFailure(self)
 
-            MainWindow.renderTasksSuccessAndFailure(self)
             if status == 1:
-                s = Timer(float(config[1]), requestTasks)
-                s.start()
+                REQUEST_THREAD = Timer(float(config[1]), requestTasks)
+                REQUEST_THREAD.start()
 
         requestTasks()
 
     def runTime(self):
-        t = None
         def timeRunning():
-            global t, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
+            global RUN_TIME_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS
             status = GLOBAL_SERVICE_STATUS
             if status == 1:
                 RUNTIME_SECONDS = RUNTIME_SECONDS + 1
@@ -135,8 +156,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if RUNTIME_MINUTES >= 60:
                     RUNTIME_HOURS = RUNTIME_HOURS + 1
                     RUNTIME_MINUTES = 0
-                t = Timer(1.0, timeRunning)
-                t.start()
+                RUN_TIME_THREAD = Timer(1.0, timeRunning)
+                RUN_TIME_THREAD.start()
             MainWindow.renderRunTime(self)
         timeRunning()
 
@@ -178,17 +199,34 @@ class MainWindow(QtWidgets.QMainWindow):
         MainWindow.ping(self)
 
     def ping(self):
+        global PING_REQUEST
         config = AppFunctions.call_config(self)
-        response = requests.get(config[0] + config[2])
-        _translate = QtCore.QCoreApplication.translate
-        if response.json()["status"] == 'success':
+        url = QtCore.QUrl(config[0] + config[2])
+        req = QtNetwork.QNetworkRequest(QtCore.QUrl(url))
+        PING_REQUEST = QtNetwork.QNetworkAccessManager()
+        PING_REQUEST.finished.connect(self.handleResponseOfPing)
+        PING_REQUEST.get(req)
+
+    def handleResponseOfPing(self, reply):
+        er = reply.error()
+        if er == QtNetwork.QNetworkReply.NoError:
             self.ui.frame_host_status.setStyleSheet("background-color: rgb(85, 255, 0); border-radius: 8px;")
             self.ui.stackedWidget.setCurrentWidget(self.ui.page_home)
-
         else:
             self.ui.frame_host_status.setStyleSheet("background-color: rgb(255, 0, 0); border-radius: 8px;")
             self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
-        
+
+    def handleResponseOfSwitchService(self, reply):
+        global GLOBAL_SERVICE_STATUS
+        er = reply.error()
+        if er == QtNetwork.QNetworkReply.NoError:
+            GLOBAL_SERVICE_STATUS = 1
+            MainWindow.runTime(self)
+            MainWindow.printService(self)
+            MainWindow.uiSwitchService(self)
+        else:
+            self.ui.stackedWidget.setCurrentWidget(self.ui.page_setting)
+            
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
