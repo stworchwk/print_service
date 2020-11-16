@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 from threading import Timer, Thread
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
@@ -12,6 +13,9 @@ from ui_functions import UIFunctions
 
 # IMPORT App FUNCTIONS
 from app_functions import AppFunctions
+
+#IMPORT Generate Pdf
+from generate_pdf import GeneratePdf
 
 GLOBAL_SERVICE_STATUS = 0
 RUNTIME_HOURS = 0
@@ -135,13 +139,17 @@ class MainWindow(QtWidgets.QMainWindow):
             global RUN_TIME_THREAD, REQUEST_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS, TASK_SUCCESS, TASK_FAILURE
             er = reply.error()
             if er == QtNetwork.QNetworkReply.NoError:
-                bytes_string = reply.readAll()
-                print(str(bytes_string, 'utf-8'))
                 TASK_SUCCESS = TASK_SUCCESS + 1
                 TASK_FAILURE = TASK_FAILURE + 1
-                print('response')
+
+                bytes_string = reply.readAll()
+                data  = json.loads(str(bytes_string, 'utf-8'))
+                for task in data['tasks']:
+                    if task['is_receipt'] == True:
+                        GeneratePdf.receipt(self, task)
+                    else:
+                        print('order bill')
             else:
-                print('response failed')
                 GLOBAL_SERVICE_STATUS = 0
                 RUNTIME_HOURS = 0
                 RUNTIME_MINUTES = 0

@@ -8,7 +8,7 @@ config = ConfigParser()
 config.read(CONFIG_FILE_NAME, encoding="utf8")
 config = config['bill']
 
-def main():
+def printPdf(self):
     PDFNet.Initialize()
     
     # Relative path to the folder containing the test files.
@@ -23,6 +23,3 @@ def main():
     height = float(config['paper_height']) #inch
     printerMode.SetPaperSize(Rect(0, 0, (width * 72), (height * 72))) #72 points = 1 inch
     Print.StartPrintJob(doc, "Coffee Bar", doc.GetFileName(), "", None, printerMode, None)
-
-if __name__ == '__main__':
-    main()
