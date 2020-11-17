@@ -131,7 +131,7 @@ class GeneratePdf():
         #Save pdf
         pdf.save()
 
-        printPdf(self, config['file_name'])
+        printPdf(self, config['file_name'], task['printer_name'])
 
     def receipt(self, task):
         global current_line
@@ -323,4 +323,4 @@ class GeneratePdf():
         #Save pdf
         pdf.save()
 
-        printPdf(self, config['file_name'])
+        printPdf(self, config['file_name'], task['printer_name'])

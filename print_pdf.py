@@ -1,4 +1,5 @@
 import sys
+import win32print
 from PDFNetPython3 import PDFNet, PDFDoc, PrinterMode, Print, Rect
 from configparser import ConfigParser
 
@@ -8,13 +9,14 @@ config = ConfigParser()
 config.read(CONFIG_FILE_NAME, encoding="utf8")
 config = config['bill']
 
-def printPdf(self, file_name):
+def printPdf(self, file_name, printer_name):
     PDFNet.Initialize()
-    
-    # Relative path to the folder containing the test files.
     
     doc = PDFDoc(file_name)
     doc.InitSecurityHandler()
+
+    if printer_name is None:
+        printer_name = win32print.GetDefaultPrinter()
     
     printerMode = PrinterMode()
     printerMode.SetAutoCenter(False)
@@ -22,4 +24,4 @@ def printPdf(self, file_name):
     width = float(config['paper_width']) #inch
     height = float(config['paper_height']) #inch
     printerMode.SetPaperSize(Rect(0, 0, (width * 72), (height * 72))) #72 points = 1 inch
-    Print.StartPrintJob(doc, "Coffee Bar", doc.GetFileName(), "", None, printerMode, None)
+    Print.StartPrintJob(doc, printer_name, doc.GetFileName(), "", None, printerMode, None)
