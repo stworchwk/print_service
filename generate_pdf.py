@@ -8,9 +8,133 @@ from configparser import ConfigParser
 from print_pdf import printPdf
 
 class GeneratePdf():
-    def receipt(self, task):
+    def bill(self, task):
         global current_line
         CONFIG_FILE_NAME = 'bill_config.ini'
+
+        config = ConfigParser()
+        config.read(CONFIG_FILE_NAME, encoding="utf8")
+        template = config['template']
+        config = config['bill']
+
+        #Register Font
+        pdfmetrics.registerFont(TTFont('bold', config['font_bold']))
+        pdfmetrics.registerFont(TTFont('regular', config['font_regular']))
+
+        fileName = config['file_name']
+
+        points = 72 #72 points = 1 inch
+
+        #Page size
+        page_width = float(config['paper_width']) * points #inch
+        page_height = float(config['paper_height']) * points #inch
+        font_size_strong = float(config['font_strong_size']) * points #inch
+        font_size_regular = float(config['font_regular_size']) * points #inch
+        margin = float(config['page_margin']) * points #inch
+        margin_bottom_of_line = float(config['margin_bottom_of_line']) * points #inch
+        current_line = page_height - margin #inch
+        first_top_margin = 0.2 #inch
+
+        def createStringCenterContent(text, type, font_size = None):
+            global current_line
+            if type == 'regular':
+                font_name = 'regular'
+                if font_size == None:
+                    font_size = font_size_regular
+            else:
+                font_name = 'bold'
+                if font_size == None:
+                    font_size = font_size_strong
+
+            pdf.setFont(font_name, font_size)
+            text_width = stringWidth(text, font_name, font_size)
+            pdf.drawString((page_width - text_width) / 2, current_line, text)
+            current_line = current_line - font_size - margin_bottom_of_line
+
+        def createStringContent(text, type, font_size = None, align = 'left', next_line = True):
+            global current_line
+            if type == 'regular':
+                font_name = 'regular'
+                if font_size == None:
+                    font_size = font_size_regular
+            else:
+                font_name = 'bold'
+                if font_size == None:
+                    font_size = font_size_strong
+
+            pdf.setFont(font_name, font_size)
+            text_width = stringWidth(text, font_name, font_size)
+            if align == 'left':
+                align = margin
+            elif align == 'right':
+                align = (page_width - text_width) - margin
+            else:
+                align = margin
+            pdf.drawString(align, current_line, text)
+            if next_line:
+                current_line = current_line - font_size - margin_bottom_of_line
+
+        pdf = canvas.Canvas(fileName)
+
+        #Setting page
+        pdf.setPageSize((page_width, page_height))
+
+        #Title
+        current_line = current_line - (points * first_top_margin) #inch
+        text = template['title']
+        createStringCenterContent(text, 'bold', 14.4)
+
+        #Point
+        text = task['point_name']
+        createStringCenterContent(text, 'regular')
+
+        #No
+        text = task['order_no']
+        createStringCenterContent(text, 'regular')
+
+        #Order Code
+        text = template['order_code'] + ' : ' + task['order_code']
+        createStringContent(text, 'regular')
+
+        #Order Table
+        text = template['order_table'] + ' : ' + task['order_table']
+        createStringContent(text, 'regular')
+
+        #Order Print By
+        text = template['print_by'] + ' : ' + task['order_created_by']
+        createStringContent(text, 'regular')
+
+        #Order Print Datetime
+        text = template['print_date_time'] + ' : ' + task['order_print_date_time']
+        createStringContent(text, 'regular', font_size_regular)
+
+        #Order List
+        current_line = current_line - 6
+        text = template['head_1_text']
+        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        text = template['head_2_text']
+        createStringContent(text, 'bold', font_size_regular, 'right')
+
+        for order_list in task['order_lists']:
+            #List1
+            text = order_list['name']
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            text = str(order_list['amount'])
+            createStringContent(text, 'regular', font_size_regular, 'right')
+
+        #Total
+        current_line = current_line - 4
+        text = template['total_text'] + ' ' + str(task['order_lists_count'])
+        createStringContent(text, 'bold', font_size_regular, 'right')
+
+        #Save pdf
+        pdf.save()
+
+        printPdf(self)
+
+    def receipt(self, task):
+        global current_line
+        CONFIG_FILE_NAME = 'receipt_config.ini'
 
         config = ConfigParser()
         config.read(CONFIG_FILE_NAME, encoding="utf8")

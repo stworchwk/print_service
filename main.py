@@ -148,7 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     if task['is_receipt'] == True:
                         GeneratePdf.receipt(self, task)
                     else:
-                        print('order bill')
+                        GeneratePdf.bill(self, task)
             else:
                 GLOBAL_SERVICE_STATUS = 0
                 RUNTIME_HOURS = 0
