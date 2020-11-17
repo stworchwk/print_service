@@ -8,12 +8,12 @@ config = ConfigParser()
 config.read(CONFIG_FILE_NAME, encoding="utf8")
 config = config['bill']
 
-def printPdf(self):
+def printPdf(self, file_name):
     PDFNet.Initialize()
     
     # Relative path to the folder containing the test files.
     
-    doc = PDFDoc(config['file_name'])
+    doc = PDFDoc(file_name)
     doc.InitSecurityHandler()
     
     printerMode = PrinterMode()

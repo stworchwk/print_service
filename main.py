@@ -166,7 +166,6 @@ class MainWindow(QtWidgets.QMainWindow):
             global RUN_TIME_THREAD, REQUEST_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS, TASK_SUCCESS, TASK_FAILURE
             er = reply.error()
             if er == QtNetwork.QNetworkReply.NoError:
-
                 bytes_string = reply.readAll()
                 data  = json.loads(str(bytes_string, 'utf-8'))
                 for task in data['tasks']:
