@@ -134,13 +134,38 @@ class MainWindow(QtWidgets.QMainWindow):
         if REQUEST_THREAD != None:
             REQUEST_THREAD.cancel()
 
+    def printTaskClear(self, task):
+        def response(reply):
+            global TASK_SUCCESS, TASK_FAILURE
+            er = reply.error()
+            if er == QtNetwork.QNetworkReply.NoError:
+                TASK_SUCCESS = TASK_SUCCESS + 1
+            else:
+                TASK_FAILURE = TASK_FAILURE + 1
+            MainWindow.renderTasksSuccessAndFailure(self)
+
+        config = AppFunctions.call_config(self)
+        url = config[0] + config[4]
+        data = '?'
+        countloop = 0
+        for task_id in task:
+            andText = ''
+            if countloop != 0:
+                andText = '&'
+            data +=  andText + 'task_id[' + str(countloop) + ']=' + str(task_id)
+            countloop = countloop + 1
+        request_tasks = QtNetwork.QNetworkAccessManager()
+        reply = request_tasks.get(QtNetwork.QNetworkRequest(QtCore.QUrl(url + data)))
+        loop = QtCore.QEventLoop()
+        reply.finished.connect(loop.quit)
+        loop.exec_()
+        response(reply)
+
     def printService(self):
         def response(reply):
             global RUN_TIME_THREAD, REQUEST_THREAD, GLOBAL_SERVICE_STATUS, RUNTIME_HOURS, RUNTIME_MINUTES, RUNTIME_SECONDS, TASK_SUCCESS, TASK_FAILURE
             er = reply.error()
             if er == QtNetwork.QNetworkReply.NoError:
-                TASK_SUCCESS = TASK_SUCCESS + 1
-                TASK_FAILURE = TASK_FAILURE + 1
 
                 bytes_string = reply.readAll()
                 data  = json.loads(str(bytes_string, 'utf-8'))
@@ -149,6 +174,9 @@ class MainWindow(QtWidgets.QMainWindow):
                         GeneratePdf.receipt(self, task)
                     else:
                         GeneratePdf.bill(self, task)
+
+                if len(data['tasks']) > 0:
+                    MainWindow.printTaskClear(self, data['task_id'])
             else:
                 GLOBAL_SERVICE_STATUS = 0
                 RUNTIME_HOURS = 0

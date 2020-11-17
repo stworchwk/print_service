@@ -89,8 +89,9 @@ class GeneratePdf():
         createStringCenterContent(text, 'regular')
 
         #No
-        text = task['order_no']
-        createStringCenterContent(text, 'regular')
+        if task['order_no'] is not None:
+            text = task['order_no']
+            createStringCenterContent(text, 'regular')
 
         #Order Code
         text = template['order_code'] + ' : ' + task['order_code']
