@@ -273,28 +273,28 @@ class GeneratePdf():
         current_line = current_line - 2
         #Total
         text = template['total_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
+        createStringContent(text, 'bold', font_size_regular, 'left', False)
         text = str(task['total_price'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
+        createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Discount
         if task['discount'] > 0:
             text = template['discount_text']
-            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            createStringContent(text, 'bold', font_size_regular, 'left', False)
             text = str(task['discount'])
-            createStringContent(text, 'regular', font_size_regular, 'right')
+            createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Net Total
         text = template['net_total_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
+        createStringContent(text, 'bold', font_size_regular, 'left', False)
         text = str(task['net_total'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
+        createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Vat
         text = template['vat_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
+        createStringContent(text, 'bold', font_size_regular, 'left', False)
         text = str(task['vat'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
+        createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Total Pay
         text = template['total_pay_text']
@@ -305,15 +305,15 @@ class GeneratePdf():
         if float(task['receive']) > 0 or float(task['change']) > 0:
             #receive
             text = template['receive_text']
-            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            createStringContent(text, 'bold', font_size_regular, 'left', False)
             text = str(task['receive'])
-            createStringContent(text, 'regular', font_size_regular, 'right')
+            createStringContent(text, 'bold', font_size_regular, 'right')
 
             #change
             text = template['change_text']
-            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            createStringContent(text, 'bold', font_size_regular, 'left', False)
             text = str(task['change'])
-            createStringContent(text, 'regular', font_size_regular, 'right')
+            createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Footer
         current_line = current_line - (0.2 * points)
