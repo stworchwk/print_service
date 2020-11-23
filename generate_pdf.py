@@ -260,41 +260,80 @@ class GeneratePdf():
         createStringContent(text, 'regular')
 
         #Order Details
-        current_line = current_line - 2
+        current_line = current_line - (0.2 * points)
+
         for order_list in task['order_lists']:
             #List
             text = order_list['text']
-            createStringContent(text, 'regular', None, 'left', False)
-            text = order_list['price']
+            list_text_width = stringWidth(text, 'regular', font_size_regular)
+            list_text_width_percent_of_page = ((list_text_width * 100) / page_width)
+            count_cut_line = 1
+            if list_text_width_percent_of_page > float(config['sub_string_n_percent_of_page']):
+                blank_area = (float(config['sub_string_n_percent_of_page']) * page_width) / 100
+                new_text = ''
+                for s in (text[i] for i in range(len(text))):
+                    new_text += s
+                    if stringWidth(new_text, 'regular', font_size_regular) > blank_area:
+                        if count_cut_line > 1:
+                            new_text = '  ' + new_text
+                        createStringContent(new_text, 'regular', None, 'left')
+                        new_text = ''
+                        count_cut_line += 1
+                if new_text != '':
+                    if count_cut_line > 1:
+                        new_text = '  ' + new_text
+                    createStringContent(new_text, 'regular', None, 'left')
+                current_line += (font_size_regular + margin_bottom_of_line) * count_cut_line
+            else:
+                createStringContent(text, 'regular', None, 'left', False)
+                
+            if order_list['price'] == order_list['discount_price']:
+                text = str(order_list['price'])
+                if order_list['other'] != None:
+                    text += order_list['other']
+            else:
+                text = str(order_list['price']) + ' ' + str(order_list['discount_price'])
+                text_cut = ' ' + str(order_list['discount_price'])
+                if order_list['other'] != None:
+                    text += order_list['other']
+                    text_cut += order_list['other']
+                d_price_text_width = stringWidth(text_cut, 'regular', font_size_regular)
+                all_price_text_width = stringWidth(text, 'regular', font_size_regular)
+                center_line = (current_line + (font_size_regular / 2.7))
+                pdf.line((page_width - all_price_text_width - 1), center_line, (page_width - d_price_text_width + 1), center_line)
+
             createStringContent(text, 'regular', None, 'right')
-        
+            if count_cut_line > 1:
+                current_line = current_line - ((font_size_regular + margin_bottom_of_line) * (count_cut_line - 1))
 
         #Order Summary
-        current_line = current_line - 2
+        pdf.line(0, current_line, page_width, current_line)
+        current_line = current_line - (0.2 * points)
+
         #Total
         text = template['total_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['total_price'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Discount
         if task['discount'] > 0:
             text = template['discount_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['discount'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Net Total
         text = template['net_total_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['net_total'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Vat
         text = template['vat_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['vat'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Total Pay
         text = template['total_pay_text']
@@ -305,17 +344,18 @@ class GeneratePdf():
         if float(task['receive']) > 0 or float(task['change']) > 0:
             #receive
             text = template['receive_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['receive'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
             #change
             text = template['change_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['change'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Footer
+        pdf.line(0, current_line, page_width, current_line)
         current_line = current_line - (0.2 * points)
 
         if task['is_real_bill'] == False:
