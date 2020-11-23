@@ -1,6 +1,7 @@
 import sys
 import win32print
 from PDFNetPython3 import PDFNet, PDFDoc, PrinterMode, Print, Rect
+#from PDFNetPython3 import *
 from configparser import ConfigParser
 
 CONFIG_FILE_NAME = 'bill_config.ini'
@@ -11,6 +12,8 @@ config = config['bill']
 
 def printPdf(self, file_name, printer_name):
     PDFNet.Initialize()
+
+    print('print pdf')
     
     doc = PDFDoc(file_name)
     doc.InitSecurityHandler()

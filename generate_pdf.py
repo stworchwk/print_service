@@ -6,6 +6,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from configparser import ConfigParser
 
 from print_pdf import printPdf
+from promptpayqr import qr_code
 
 class GeneratePdf():
     def bill(self, task):
@@ -315,7 +316,28 @@ class GeneratePdf():
             createStringContent(text, 'bold', font_size_regular, 'right')
 
         #Footer
-        current_line = current_line - 10
+        current_line = current_line - (0.2 * points)
+
+        if task['is_real_bill'] == False:
+            #Payment text
+            text = template['payment_text']
+            createStringCenterContent(text, 'regular')
+
+            #Generate Promptpay QRCode
+            qr_code(template['promptpay_id'], one_time=True, path_qr_code="", country="TH" ,money=str(task['total']), currency="THB")
+
+            #Specify Promptpay QRCode size
+            pp_image = template['promptpay_qrcode_file_name']
+            pp_im = Image.open(pp_image)
+            pp_width, pp_height = pp_im.size
+            pp_ratio = pp_width / pp_height
+            pp_image_width = float(template['promptpay_qrcode_size']) * points #inch
+            pp_image_height = pp_image_width / pp_ratio
+
+            #Promptpay QRCode
+            pdf.drawInlineImage(pp_image, (page_width - pp_image_width) / 2, current_line - pp_image_height, pp_image_width, pp_image_height)
+            current_line = current_line - pp_image_height - (0.2 * points)
+
         #Thank you
         text = template['footer_thank_you']
         createStringCenterContent(text, 'bold', font_size_regular)
