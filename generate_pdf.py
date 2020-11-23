@@ -273,28 +273,28 @@ class GeneratePdf():
         current_line = current_line - 2
         #Total
         text = template['total_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['total_price'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Discount
         if task['discount'] > 0:
             text = template['discount_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['discount'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Net Total
         text = template['net_total_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['net_total'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Vat
         text = template['vat_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         text = str(task['vat'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Total Pay
         text = template['total_pay_text']
@@ -305,23 +305,20 @@ class GeneratePdf():
         if float(task['receive']) > 0 or float(task['change']) > 0:
             #receive
             text = template['receive_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['receive'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
             #change
             text = template['change_text']
-            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
             text = str(task['change'])
-            createStringContent(text, 'bold', font_size_regular, 'right')
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Footer
         current_line = current_line - (0.2 * points)
 
         if task['is_real_bill'] == False:
-            #Payment text
-            text = template['payment_text']
-            createStringCenterContent(text, 'regular')
 
             #Generate Promptpay QRCode
             qr_code(template['promptpay_id'], one_time=True, path_qr_code="", country="TH" ,money=str(task['total']), currency="THB")
@@ -337,10 +334,14 @@ class GeneratePdf():
             #Promptpay QRCode
             pdf.drawInlineImage(pp_image, (page_width - pp_image_width) / 2, current_line - pp_image_height, pp_image_width, pp_image_height)
             current_line = current_line - pp_image_height - (0.2 * points)
+            
+            #Payment text
+            text = template['payment_text']
+            createStringCenterContent(text, 'regular')
 
         #Thank you
         text = template['footer_thank_you']
-        createStringCenterContent(text, 'bold', font_size_regular)
+        createStringCenterContent(text, 'regular')
 
         #Save pdf
         pdf.save()
