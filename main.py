@@ -293,11 +293,11 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.setToolTip('DSK Print Service')
         menu = QtWidgets.QMenu(parent)
 
-        open_app = menu.addAction("เปิด DSK Print Service")
+        open_app = menu.addAction("Open - DSK Print Service")
         open_app.triggered.connect(self.open_print_service)
         open_app.setIcon(QtGui.QIcon('icon.ico'))
 
-        close_app = menu.addAction("ปิดโปรแกรม")
+        close_app = menu.addAction("Close")
         close_app.triggered.connect(self.close_print_service)
         close_app.setIcon(QtGui.QIcon('close-btn.ico'))
 
@@ -327,5 +327,5 @@ if __name__ == "__main__":
     w = QtWidgets.QWidget()
     tray_icon = SystemTrayIcon(QtGui.QIcon("icon.ico"), w)
     tray_icon.show()
-    tray_icon.showMessage("DSK Print Service", 'คลิกที่นี่ เพื่อเปิดโปรแกรม', QtGui.QIcon("icon.ico"))
+    tray_icon.showMessage("DSK Print Service", 'Welcome to our product\nPowered by Dot Socket Co., Ltd.', QtGui.QIcon("icon.ico"))
     sys.exit(app.exec_())
