@@ -246,6 +246,15 @@ class GeneratePdf():
         text = template['restaurant_title']
         createStringCenterContent(text, 'bold', font_size_regular)
 
+        if task['is_real_bill'] == True:
+            if task['order_head_note'] != None:
+                #Note
+                text = task['order_head_note']
+                for h_text in text.split('\n'):
+                    createStringCenterContent(h_text, 'regular')
+
+
+
         #Order code
         current_line = current_line - 2
         text = "เลขที่ : " + task['order_code']

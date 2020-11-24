@@ -25,6 +25,7 @@ TASK_SUCCESS = 0
 TASK_FAILURE = 0
 RUN_TIME_THREAD = None
 REQUEST_THREAD = None
+MAIN_WINDOW = None
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -56,9 +57,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btn_close.clicked.connect(lambda: closeWindow())
 
         def closeWindow():
-            global RUN_TIME_THREAD, REQUEST_THREAD
-            self.close()
-            MainWindow.stopAllThread(self)
+            self.hide()
+            #global RUN_TIME_THREAD, REQUEST_THREAD
+            #self.close()
+            #MainWindow.stopAllThread(self)
 
         ## PAGES
         ########################################################################
@@ -284,9 +286,46 @@ class MainWindow(QtWidgets.QMainWindow):
         reply.finished.connect(loop.quit)
         loop.exec_()
         response(reply)
+
+class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
+    def __init__(self, icon, parent=None):
+        QtWidgets.QSystemTrayIcon.__init__(self, icon, parent)
+        self.setToolTip('DSK Print Service')
+        menu = QtWidgets.QMenu(parent)
+
+        open_app = menu.addAction("เปิด DSK Print Service")
+        open_app.triggered.connect(self.open_print_service)
+        open_app.setIcon(QtGui.QIcon('icon.ico'))
+
+        close_app = menu.addAction("ปิดโปรแกรม")
+        close_app.triggered.connect(self.close_print_service)
+        close_app.setIcon(QtGui.QIcon('close-btn.ico'))
+
+        menu.addSeparator()
+
+        self.setContextMenu(menu)
+        self.activated.connect(self.onTrayIconActivated)
+
+    def onTrayIconActivated(self, reason):
+        if reason == self.DoubleClick:
+            MAIN_WINDOW.show()
+
+    def open_print_service(self):
+        MAIN_WINDOW.show()
+
+    def close_print_service(self):
+        MAIN_WINDOW.stopAllThread()
+        MAIN_WINDOW.close()
             
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
+    MAIN_WINDOW = MainWindow()
+    MAIN_WINDOW.show()
+
+    #Tray
+    w = QtWidgets.QWidget()
+    tray_icon = SystemTrayIcon(QtGui.QIcon("icon.ico"), w)
+    tray_icon.show()
+    tray_icon.showMessage("DSK Print Service", 'คลิกที่นี่ เพื่อเปิดโปรแกรม', QtGui.QIcon("icon.ico"))
     sys.exit(app.exec_())
