@@ -129,6 +129,9 @@ class GeneratePdf():
         text = template['total_text'] + ' ' + str(task['order_lists_count'])
         createStringContent(text, 'bold', font_size_regular, 'right')
 
+        text = 'คิว ' + str(task['order_queue'])
+        createStringCenterContent(text, 'regular')
+
         #Save pdf
         pdf.save()
 
@@ -390,6 +393,9 @@ class GeneratePdf():
 
         #Thank you
         text = template['footer_thank_you']
+        createStringCenterContent(text, 'regular')
+
+        text = 'คิว ' + str(task['order_queue'])
         createStringCenterContent(text, 'regular')
 
         #Save pdf
