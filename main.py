@@ -175,10 +175,16 @@ class MainWindow(QtWidgets.QMainWindow):
                         print_status = GeneratePdf.receipt(self, task)
                         if print_status:
                             MainWindow.printTaskClear(self, [task['id']])
+                        else:
+                            TASK_FAILURE = TASK_FAILURE + 1
+                            MainWindow.renderTasksSuccessAndFailure(self)
                     else:
                         print_status = GeneratePdf.bill(self, task)
                         if print_status:
                             MainWindow.printTaskClear(self, [task['id']])
+                        else:
+                            TASK_FAILURE = TASK_FAILURE + 1
+                            MainWindow.renderTasksSuccessAndFailure(self)
 
                 #if len(data['tasks']) > 0:
                 #    MainWindow.printTaskClear(self, data['task_id'])
