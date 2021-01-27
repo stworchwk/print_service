@@ -337,9 +337,8 @@ class GeneratePdf():
         current_line = current_line - (0.2 * points)
 
         #Total
-        if task['total_text'] is not None:
-            text = template['total_text']
-            createStringContent(text, 'regular', font_size_regular, 'left', False)
+        text = template['total_text']
+        createStringContent(text, 'regular', font_size_regular, 'left', False)
         
         if task['total_price'] is not None:
             text = str(task['total_price'])
