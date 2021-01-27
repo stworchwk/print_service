@@ -95,20 +95,24 @@ class GeneratePdf():
             createStringCenterContent(text, 'regular')
 
         #Order Code
-        text = template['order_code'] + ' : ' + task['order_code']
-        createStringContent(text, 'regular')
+        if task['order_code'] is not None:
+            text = template['order_code'] + ' : ' + task['order_code']
+            createStringContent(text, 'regular')
 
         #Order Table
-        text = template['order_table'] + ' : ' + task['order_table']
-        createStringContent(text, 'regular')
+        if task['order_table'] is not None:
+            text = template['order_table'] + ' : ' + task['order_table']
+            createStringContent(text, 'regular')
 
         #Order Print By
-        text = template['print_by'] + ' : ' + task['order_created_by']
-        createStringContent(text, 'regular')
+        if task['order_created_by'] is not None:
+            text = template['print_by'] + ' : ' + task['order_created_by']
+            createStringContent(text, 'regular')
 
         #Order Print Datetime
-        text = template['print_date_time'] + ' : ' + task['order_print_date_time']
-        createStringContent(text, 'regular', font_size_regular)
+        if task['order_print_date_time'] is not None:
+            text = template['print_date_time'] + ' : ' + task['order_print_date_time']
+            createStringContent(text, 'regular', font_size_regular)
 
         #Order List
         current_line = current_line - 6
@@ -117,25 +121,31 @@ class GeneratePdf():
         text = template['head_2_text']
         createStringContent(text, 'bold', font_size_regular, 'right')
 
-        for order_list in task['order_lists']:
-            #List1
-            text = order_list['name']
-            createStringContent(text, 'regular', font_size_regular, 'left', False)
-            text = str(order_list['amount'])
-            createStringContent(text, 'regular', font_size_regular, 'right')
+        if task['order_lists'] is not None:
+            for order_list in task['order_lists']:
+                #List1
+                if order_list['name'] is not None:
+                    text = order_list['name']
+                    createStringContent(text, 'regular', font_size_regular, 'left', False)
+                
+                if order_list['amount'] is not None:
+                    text = str(order_list['amount'])
+                    createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Total
-        current_line = current_line - 4
-        text = template['total_text'] + ' ' + str(task['order_lists_count'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        if task['order_lists_count'] is not None:
+            current_line = current_line - 4
+            text = template['total_text'] + ' ' + str(task['order_lists_count'])
+            createStringContent(text, 'bold', font_size_regular, 'right')
 
-        text = 'คิว ' + str(task['order_queue'])
-        createStringCenterContent(text, 'regular')
+        if task['order_lists_count'] is not None:
+            text = 'คิว ' + str(task['order_lists_count'])
+            createStringCenterContent(text, 'bold')
 
         #Save pdf
         pdf.save()
 
-        printPdf(self, config['file_name'], task['printer_name'])
+        return printPdf(self, config['file_name'], task['printer_name'])
 
     def receipt(self, task):
         global current_line
@@ -259,99 +269,110 @@ class GeneratePdf():
 
 
         #Order code
-        current_line = current_line - 2
-        text = "เลขที่ : " + task['order_code']
-        createStringContent(text, 'regular')
+        if task['order_code'] is not None:
+            current_line = current_line - 2
+            text = "เลขที่ : " + task['order_code']
+            createStringContent(text, 'regular')
 
         #Order Date
-        text = "วันที่ : " + task['order_print_date']
-        createStringContent(text, 'regular')
+        if task['order_print_date'] is not None:
+            text = "วันที่ : " + task['order_print_date']
+            createStringContent(text, 'regular')
 
         #Order Time
-        text = "เวลา : " + task['order_print_time']
-        createStringContent(text, 'regular')
+        if task['order_print_time'] is not None:
+            text = "เวลา : " + task['order_print_time']
+            createStringContent(text, 'regular')
 
         #Order Details
         current_line = current_line - (0.2 * points)
 
-        for order_list in task['order_lists']:
-            #List
-            text = order_list['text']
-            list_text_width = stringWidth(text, 'regular', font_size_regular)
-            list_text_width_percent_of_page = ((list_text_width * 100) / page_width)
-            count_cut_line = 1
-            if list_text_width_percent_of_page > float(config['sub_string_n_percent_of_page']):
-                blank_area = (float(config['sub_string_n_percent_of_page']) * page_width) / 100
-                new_text = ''
-                for s in (text[i] for i in range(len(text))):
-                    new_text += s
-                    if stringWidth(new_text, 'regular', font_size_regular) > blank_area:
+        if task['order_lists'] is not None:
+            for order_list in task['order_lists']:
+                #List
+                text = order_list['text']
+                list_text_width = stringWidth(text, 'regular', font_size_regular)
+                list_text_width_percent_of_page = ((list_text_width * 100) / page_width)
+                count_cut_line = 1
+                if list_text_width_percent_of_page > float(config['sub_string_n_percent_of_page']):
+                    blank_area = (float(config['sub_string_n_percent_of_page']) * page_width) / 100
+                    new_text = ''
+                    for s in (text[i] for i in range(len(text))):
+                        new_text += s
+                        if stringWidth(new_text, 'regular', font_size_regular) > blank_area:
+                            if count_cut_line > 1:
+                                new_text = '  ' + new_text
+                            createStringContent(new_text, 'regular', None, 'left')
+                            new_text = ''
+                            count_cut_line += 1
+                    if new_text != '':
                         if count_cut_line > 1:
                             new_text = '  ' + new_text
                         createStringContent(new_text, 'regular', None, 'left')
-                        new_text = ''
-                        count_cut_line += 1
-                if new_text != '':
-                    if count_cut_line > 1:
-                        new_text = '  ' + new_text
-                    createStringContent(new_text, 'regular', None, 'left')
-                current_line += (font_size_regular + margin_bottom_of_line) * count_cut_line
-            else:
-                createStringContent(text, 'regular', None, 'left', False)
-                
-            if order_list['price'] == order_list['discount_price']:
-                text = str(order_list['price'])
-                if order_list['other'] != None:
-                    text += order_list['other']
-            else:
-                text = str(order_list['price']) + ' ' + str(order_list['discount_price'])
-                text_cut = ' ' + str(order_list['discount_price'])
-                if order_list['other'] != None:
-                    text += order_list['other']
-                    text_cut += order_list['other']
-                d_price_text_width = stringWidth(text_cut, 'regular', font_size_regular)
-                all_price_text_width = stringWidth(text, 'regular', font_size_regular)
-                center_line = (current_line + (font_size_regular / 2.7))
-                pdf.line((page_width - all_price_text_width - 1), center_line, (page_width - d_price_text_width + 1), center_line)
+                    current_line += (font_size_regular + margin_bottom_of_line) * count_cut_line
+                else:
+                    createStringContent(text, 'regular', None, 'left', False)
+                    
+                if order_list['price'] == order_list['discount_price']:
+                    text = str(order_list['price'])
+                    if order_list['other'] != None:
+                        text += order_list['other']
+                else:
+                    text = str(order_list['price']) + ' ' + str(order_list['discount_price'])
+                    text_cut = ' ' + str(order_list['discount_price'])
+                    if order_list['other'] != None:
+                        text += order_list['other']
+                        text_cut += order_list['other']
+                    d_price_text_width = stringWidth(text_cut, 'regular', font_size_regular)
+                    all_price_text_width = stringWidth(text, 'regular', font_size_regular)
+                    center_line = (current_line + (font_size_regular / 2.7))
+                    pdf.line((page_width - all_price_text_width - 1), center_line, (page_width - d_price_text_width + 1), center_line)
 
-            createStringContent(text, 'regular', None, 'right')
-            if count_cut_line > 1:
-                current_line = current_line - ((font_size_regular + margin_bottom_of_line) * (count_cut_line - 1))
+                createStringContent(text, 'regular', None, 'right')
+                if count_cut_line > 1:
+                    current_line = current_line - ((font_size_regular + margin_bottom_of_line) * (count_cut_line - 1))
 
         #Order Summary
         pdf.line(0, current_line, page_width, current_line)
         current_line = current_line - (0.2 * points)
 
         #Total
-        text = template['total_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
-        text = str(task['total_price'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
-
-        #Discount
-        if task['discount'] > 0:
-            text = template['discount_text']
+        if task['total_text'] is not None:
+            text = template['total_text']
             createStringContent(text, 'regular', font_size_regular, 'left', False)
-            text = str(task['discount'])
+        
+        if task['total_price'] is not None:
+            text = str(task['total_price'])
             createStringContent(text, 'regular', font_size_regular, 'right')
 
+        #Discount
+        if task['discount'] is not None:
+            if task['discount'] > 0:
+                text = template['discount_text']
+                createStringContent(text, 'regular', font_size_regular, 'left', False)
+                text = str(task['discount'])
+                createStringContent(text, 'regular', font_size_regular, 'right')
+
         #Net Total
-        text = template['net_total_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
-        text = str(task['net_total'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
+        if task['net_total'] is not None:
+            text = template['net_total_text']
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            text = str(task['net_total'])
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Vat
-        text = template['vat_text']
-        createStringContent(text, 'regular', font_size_regular, 'left', False)
-        text = str(task['vat'])
-        createStringContent(text, 'regular', font_size_regular, 'right')
+        if task['vat'] is not None:
+            text = template['vat_text']
+            createStringContent(text, 'regular', font_size_regular, 'left', False)
+            text = str(task['vat'])
+            createStringContent(text, 'regular', font_size_regular, 'right')
 
         #Total Pay
-        text = template['total_pay_text']
-        createStringContent(text, 'bold', font_size_regular, 'left', False)
-        text = str(task['total'])
-        createStringContent(text, 'bold', font_size_regular, 'right')
+        if task['total'] is not None:
+            text = template['total_pay_text']
+            createStringContent(text, 'bold', font_size_regular, 'left', False)
+            text = str(task['total'])
+            createStringContent(text, 'bold', font_size_regular, 'right')
 
         if float(task['receive']) > 0 or float(task['change']) > 0:
             #receive
@@ -396,9 +417,9 @@ class GeneratePdf():
         createStringCenterContent(text, 'regular')
 
         text = 'คิว ' + str(task['order_queue'])
-        createStringCenterContent(text, 'regular')
+        createStringCenterContent(text, 'bold')
 
         #Save pdf
         pdf.save()
 
-        printPdf(self, config['file_name'], task['printer_name'])
+        return printPdf(self, config['file_name'], task['printer_name'])

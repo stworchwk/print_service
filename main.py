@@ -172,12 +172,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 data  = json.loads(str(bytes_string, 'utf-8'))
                 for task in data['tasks']:
                     if task['is_receipt'] == True:
-                        GeneratePdf.receipt(self, task)
+                        print_status = GeneratePdf.receipt(self, task)
+                        if print_status:
+                            MainWindow.printTaskClear(self, [task['id']])
                     else:
-                        GeneratePdf.bill(self, task)
+                        print_status = GeneratePdf.bill(self, task)
+                        if print_status:
+                            MainWindow.printTaskClear(self, [task['id']])
 
-                if len(data['tasks']) > 0:
-                    MainWindow.printTaskClear(self, data['task_id'])
+                #if len(data['tasks']) > 0:
+                #    MainWindow.printTaskClear(self, data['task_id'])
             else:
                 GLOBAL_SERVICE_STATUS = 0
                 RUNTIME_HOURS = 0
