@@ -266,7 +266,10 @@ class GeneratePdf():
                 for h_text in text.split('\n'):
                     createStringCenterContent(h_text, 'regular')
 
-
+         #Order Table
+        if task['order_table'] is not None:
+            text = template['order_table'] + ' : ' + task['order_table']
+            createStringContent(text, 'regular')
 
         #Order code
         if task['order_code'] is not None:
