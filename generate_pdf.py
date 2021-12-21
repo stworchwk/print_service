@@ -396,7 +396,7 @@ class GeneratePdf():
         if task['is_real_bill'] == False:
 
             #Generate Promptpay QRCode
-            qr_code(template['promptpay_id'], one_time=True, path_qr_code="", country="TH" ,money=str(task['total']), currency="THB")
+            qr_code(template['promptpay_account'], money=str(task['total']))
 
             #Specify Promptpay QRCode size
             pp_image = template['promptpay_qrcode_file_name']

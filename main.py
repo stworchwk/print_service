@@ -169,7 +169,7 @@ class MainWindow(QtWidgets.QMainWindow):
             er = reply.error()
             if er == QtNetwork.QNetworkReply.NoError:
                 bytes_string = reply.readAll()
-                data  = json.loads(str(bytes_string, 'utf-8'))
+                data = json.loads(str(bytes_string, 'utf-8'))
                 for task in data['tasks']:
                     if task['is_receipt'] == True:
                         print_status = GeneratePdf.receipt(self, task)
@@ -326,7 +326,6 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def close_print_service(self):
         MAIN_WINDOW.stopAllThread()
         MAIN_WINDOW.close()
-            
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -334,8 +333,8 @@ if __name__ == "__main__":
     MAIN_WINDOW.show()
 
     #Tray
-    w = QtWidgets.QWidget()
-    tray_icon = SystemTrayIcon(QtGui.QIcon("icon.ico"), w)
-    tray_icon.show()
-    tray_icon.showMessage("DSK Print Service", 'Welcome to our product\nPowered by Dot Socket Co., Ltd.', QtGui.QIcon("icon.ico"))
+    #w = QtWidgets.QWidget()
+    #tray_icon = SystemTrayIcon(QtGui.QIcon("icon.ico"), w)
+    #tray_icon.show()
+    #tray_icon.showMessage("DSK Print Service", 'Welcome to our product\nPowered by Dot Socket Co., Ltd.', QtGui.QIcon("icon.ico"))
     sys.exit(app.exec_())
