@@ -57,7 +57,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.btn_close.clicked.connect(lambda: closeWindow())
 
         def closeWindow():
-            self.hide()
+            #self.hide()
+            MAIN_WINDOW.stopAllThread()
+            MAIN_WINDOW.close()
             #global RUN_TIME_THREAD, REQUEST_THREAD
             #self.close()
             #MainWindow.stopAllThread(self)

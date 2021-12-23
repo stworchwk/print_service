@@ -1,7 +1,6 @@
 import sys
 import win32print
-from PDFNetPython3 import PDFNet, PDFDoc, PrinterMode, Print, Rect
-#from PDFNetPython3 import *
+from PDFNetPython import PDFNet, PDFDoc, PrinterMode, Print, Rect
 from configparser import ConfigParser
 
 CONFIG_FILE_NAME = 'bill_config.ini'
